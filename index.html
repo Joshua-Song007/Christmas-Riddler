@@ -4,273 +4,420 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christmas Puzzle Challenge</title>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #b91c1c 0%, #15803d 50%, #b91c1c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .score-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 4px solid #16a34a;
+            margin-bottom: 20px;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            color: #1f2937;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        
+        .hint-box {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-box p {
+            color: #1e40af;
+            font-weight: 500;
+        }
+        
+        .answer-box {
+            background: #dcfce7;
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .answer-title {
+            color: #15803d;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .answer-text {
+            color: #166534;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .answer-prompt {
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-blue {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-blue:hover {
+            background: #2563eb;
+        }
+        
+        .btn-yellow {
+            background: #eab308;
+            color: white;
+        }
+        
+        .btn-yellow:hover {
+            background: #ca8a04;
+        }
+        
+        .btn-red {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-red:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-green {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-green:hover {
+            background: #15803d;
+        }
+        
+        .instructions {
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #374151;
+        }
+        
+        .final-score {
+            text-align: center;
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 4px solid #fbbf24;
+        }
+        
+        .final-score h2 {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #16a34a;
+            margin: 20px 0;
+        }
+        
+        .score-message {
+            font-size: 1.5rem;
+            color: #374151;
+            margin-bottom: 30px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 640px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.1rem;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState } = React;
-        
-        const Gift = ({ className, size = 24 }) => (
-            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 12 20 22 4 22 4 12"></polyline>
-                <rect x="2" y="7" width="20" height="5"></rect>
-                <line x1="12" y1="22" x2="12" y2="7"></line>
-                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
-                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
-            </svg>
-        );
-        
-        const Star = ({ className, size = 24, fill }) => (
-            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-        );
-        
-        const Sparkles = ({ className, size = 24 }) => (
-            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M5.6 18.4L18.4 5.6"></path>
-            </svg>
-        );
-        
-        const ChevronRight = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-        );
-        
-        const RotateCcw = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="1 4 1 10 7 10"></polyline>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-            </svg>
-        );
-
-        const ChristmasRiddleGame = () => {
-            const [riddles] = useState([
-                {
-                    question: "I'm red and white and bring delight, I'm twisted sweet, a peppermint treat. What am I?",
-                    answer: "Candy Cane",
-                    hint: "You can hang me on a tree!"
-                },
-                {
-                    question: "I have a beard that's long and white, I bring joy on Christmas night. Who am I?",
-                    answer: "Santa Claus",
-                    hint: "Ho ho ho!"
-                },
-                {
-                    question: "I'm made of snow but I don't last, with a carrot nose and coal eyes that contrast. What am I?",
-                    answer: "Snowman",
-                    hint: "Frosty is famous!"
-                },
-                {
-                    question: "I'm wrapped with care beneath the tree, inside me there's a mystery. What am I?",
-                    answer: "Present",
-                    hint: "You shake me to guess what's inside!"
-                },
-                {
-                    question: "I have needles but I cannot sew, I'm decorated with lights all aglow. What am I?",
-                    answer: "Christmas Tree",
-                    hint: "I'm the star of the living room!"
-                },
-                {
-                    question: "You are given nine gold coins that look identical. You are told that one of them is fake, and that this coin weighs less than the real ones. You are also given a set of old-fashioned balance scales that weigh groups of objects and show which group is heavier. What is the smallest number of weighings you need to carry out to determine which is the fake coin?",
-                    answer: "2 weighings - Weigh in sets of three first, then weigh in sets of one",
-                    hint: "Think about dividing the coins into equal groups"
-                },
-                {
-                    question: "You've been transported back in time to help cook Christmas dinner. Your job is to bake the Christmas pie, but there aren't even any clocks in the kitchen, let alone mobile phones. All you've got is two egg-timers: one that times exactly four minutes, and one that times exactly seven minutes. The scary chef tells you to put the pie in the oven for exactly ten minutes and no longer. How can you time ten minutes exactly, and avoid getting told off by the chef?",
-                    answer: "Start both timers at the same time. Wait until the 4 minute timer finishes, leaving 3 minutes on the 7 minute timer. Once the 7 minute timer finishes, start it again - this gives you 3 + 7 = 10 minutes total",
-                    hint: "The trick involves using the difference between the two timers"
-                }
-            ]);
-
-            const [currentRiddle, setCurrentRiddle] = useState(0);
-            const [showHint, setShowHint] = useState(false);
-            const [showAnswer, setShowAnswer] = useState(false);
-            const [score, setScore] = useState(0);
-            const [answered, setAnswered] = useState(false);
-            const [gameComplete, setGameComplete] = useState(false);
-
-            const nextRiddle = () => {
-                if (currentRiddle < riddles.length - 1) {
-                    setCurrentRiddle(currentRiddle + 1);
-                    setShowHint(false);
-                    setShowAnswer(false);
-                    setAnswered(false);
-                } else {
-                    setGameComplete(true);
-                }
-            };
-
-            const resetGame = () => {
-                setCurrentRiddle(0);
-                setShowHint(false);
-                setShowAnswer(false);
-                setScore(0);
-                setAnswered(false);
-                setGameComplete(false);
-            };
-
-            const revealAnswer = () => {
-                setShowAnswer(true);
-            };
-
-            const markCorrect = () => {
-                setScore(score + 1);
-                setAnswered(true);
-            };
-
-            const markIncorrect = () => {
-                setAnswered(true);
-            };
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-red-600 via-green-700 to-red-800 p-6 flex items-center justify-center">
-                    <div className="max-w-3xl w-full">
-                        {gameComplete ? (
-                            <div className="text-center">
-                                <div className="bg-white rounded-2xl shadow-2xl p-12 mb-6 border-4 border-yellow-400">
-                                    <div className="mb-6">
-                                        <Star className="text-yellow-500 mx-auto mb-4" size={80} fill="currentColor" />
-                                        <h2 className="text-4xl font-bold text-gray-800 mb-4">🎉 Game Complete! 🎉</h2>
-                                        <p className="text-6xl font-bold text-green-600 mb-4">{score} / {riddles.length}</p>
-                                        <p className="text-2xl text-gray-700 mb-2">
-                                            {score === riddles.length ? "Perfect score! You're a puzzle master! 🌟" :
-                                             score >= riddles.length / 2 ? "Great job! Well done! 👏" :
-                                             "Good effort! Try again to improve your score! 💪"}
-                                        </p>
-                                    </div>
-                                    <button
-                                        onClick={resetGame}
-                                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-bold text-xl transition flex items-center gap-2 mx-auto"
-                                    >
-                                        <RotateCcw size={24} /> Play Again
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="text-center mb-8">
-                                    <div className="flex items-center justify-center gap-2 mb-4">
-                                        <Gift className="text-yellow-300" size={40} />
-                                        <h1 className="text-5xl font-bold text-white">Christmas Puzzle Challenge</h1>
-                                        <Gift className="text-yellow-300" size={40} />
-                                    </div>
-                                    <div className="flex items-center justify-center gap-4 text-white">
-                                        <div className="flex items-center gap-2">
-                                            <Star className="text-yellow-300" fill="currentColor" />
-                                            <span className="text-xl font-semibold">Score: {score}/{riddles.length}</span>
-                                        </div>
-                                        <div className="text-lg">
-                                            Puzzle {currentRiddle + 1} of {riddles.length}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white rounded-2xl shadow-2xl p-8 mb-6 border-4 border-green-600">
-                                    <div className="flex items-start gap-3 mb-6">
-                                        <Sparkles className="text-yellow-500 flex-shrink-0 mt-1" size={28} />
-                                        <p className="text-xl text-gray-800 font-medium leading-relaxed">
-                                            {riddles[currentRiddle].question}
-                                        </p>
-                                    </div>
-
-                                    {showHint && (
-                                        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-                                            <p className="text-blue-800 font-medium">
-                                                💡 Hint: {riddles[currentRiddle].hint}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {showAnswer && (
-                                        <div className="bg-green-50 border-2 border-green-400 rounded-lg p-6 mb-6">
-                                            <p className="text-green-800 font-semibold mb-2 text-lg">
-                                                🎉 Answer:
-                                            </p>
-                                            <p className="text-green-900 text-base leading-relaxed mb-4">
-                                                {riddles[currentRiddle].answer}
-                                            </p>
-                                            {!answered && (
-                                                <div className="text-center">
-                                                    <p className="text-gray-700 font-medium mb-3">Did you get it right?</p>
-                                                    <div className="flex gap-3 justify-center">
-                                                        <button
-                                                            onClick={markCorrect}
-                                                            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition"
-                                                        >
-                                                            ✓ Yes, I got it!
-                                                        </button>
-                                                        <button
-                                                            onClick={markIncorrect}
-                                                            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition"
-                                                        >
-                                                            ✗ No, I didn't
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {answered && (
-                                                <div className="text-center">
-                                                    <p className="text-gray-600 font-medium">Answer recorded! ✓</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-wrap gap-3 justify-center">
-                                        {!showHint && !showAnswer && (
-                                            <button
-                                                onClick={() => setShowHint(true)}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-                                            >
-                                                💡 Show Hint
-                                            </button>
-                                        )}
-                                        
-                                        {!showAnswer && (
-                                            <button
-                                                onClick={revealAnswer}
-                                                className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-                                            >
-                                                🎁 Reveal Answer
-                                            </button>
-                                        )}
-
-                                        {showAnswer && answered && (
-                                            <button
-                                                onClick={nextRiddle}
-                                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2"
-                                            >
-                                                {currentRiddle < riddles.length - 1 ? (
-                                                    <>Next Puzzle <ChevronRight size={20} /></>
-                                                ) : (
-                                                    <>See Final Score <ChevronRight size={20} /></>
-                                                )}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white/90 rounded-lg p-4 text-center">
-                                    <p className="text-gray-700 text-sm">
-                                        🎅 <strong>How to play:</strong> Read the puzzle and try to solve it! Use hints if you get stuck, 
-                                        then reveal the answer. Tell us if you got it right or wrong to track your score!
-                                    </p>
-                                </div>
-                            </>
-                        )}
+    <div class="container">
+        <div id="game-screen">
+            <div class="header">
+                <h1 class="title">🎁 Christmas Puzzle Challenge 🎁</h1>
+                <div class="score-bar">
+                    <span>⭐ Score: <strong><span id="current-score">0</span>/7</strong></span>
+                    <span>Puzzle <span id="current-puzzle">1</span> of 7</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="question" id="question"></div>
+                
+                <div id="hint-section" class="hint-box hidden">
+                    <p>💡 Hint: <span id="hint-text"></span></p>
+                </div>
+                
+                <div id="answer-section" class="answer-box hidden">
+                    <p class="answer-title">🎉 Answer:</p>
+                    <p class="answer-text" id="answer-text"></p>
+                    <div id="response-buttons">
+                        <p class="answer-prompt">Did you get it right?</p>
+                        <div class="button-group">
+                            <button class="btn-green" onclick="markCorrect()">✓ Yes, I got it!</button>
+                            <button class="btn-red" onclick="markIncorrect()">✗ No, I didn't</button>
+                        </div>
+                    </div>
+                    <div id="recorded-message" class="hidden">
+                        <p style="color: #6b7280; font-weight: 500;">Answer recorded! ✓</p>
                     </div>
                 </div>
-            );
-        };
+                
+                <div class="button-group">
+                    <button id="hint-btn" class="btn-blue" onclick="showHint()">💡 Show Hint</button>
+                    <button id="reveal-btn" class="btn-yellow" onclick="revealAnswer()">🎁 Reveal Answer</button>
+                    <button id="next-btn" class="btn-red hidden" onclick="nextPuzzle()">Next Puzzle →</button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <p><strong>🎅 How to play:</strong> Read the puzzle and try to solve it! Use hints if you get stuck, 
+                then reveal the answer. Tell us if you got it right or wrong to track your score!</p>
+            </div>
+        </div>
+        
+        <div id="final-screen" class="final-score hidden">
+            <div style="font-size: 5rem; margin-bottom: 20px;">⭐</div>
+            <h2>🎉 Game Complete! 🎉</h2>
+            <div class="score-display"><span id="final-score">0</span> / 7</div>
+            <p class="score-message" id="score-message"></p>
+            <button class="btn-green" onclick="resetGame()" style="font-size: 1.2rem; padding: 20px 40px;">
+                🔄 Play Again
+            </button>
+        </div>
+    </div>
 
-        ReactDOM.render(<ChristmasRiddleGame />, document.getElementById('root'));
+    <script>
+        const riddles = [
+            {
+                question: "I'm red and white and bring delight, I'm twisted sweet, a peppermint treat. What am I?",
+                answer: "Candy Cane",
+                hint: "You can hang me on a tree!"
+            },
+            {
+                question: "I have a beard that's long and white, I bring joy on Christmas night. Who am I?",
+                answer: "Santa Claus",
+                hint: "Ho ho ho!"
+            },
+            {
+                question: "I'm made of snow but I don't last, with a carrot nose and coal eyes that contrast. What am I?",
+                answer: "Snowman",
+                hint: "Frosty is famous!"
+            },
+            {
+                question: "I'm wrapped with care beneath the tree, inside me there's a mystery. What am I?",
+                answer: "Present",
+                hint: "You shake me to guess what's inside!"
+            },
+            {
+                question: "I have needles but I cannot sew, I'm decorated with lights all aglow. What am I?",
+                answer: "Christmas Tree",
+                hint: "I'm the star of the living room!"
+            },
+            {
+                question: "You are given nine gold coins that look identical. You are told that one of them is fake, and that this coin weighs less than the real ones. You are also given a set of old-fashioned balance scales that weigh groups of objects and show which group is heavier. What is the smallest number of weighings you need to carry out to determine which is the fake coin?",
+                answer: "2 weighings - Weigh in sets of three first, then weigh in sets of one",
+                hint: "Think about dividing the coins into equal groups"
+            },
+            {
+                question: "You've been transported back in time to help cook Christmas dinner. Your job is to bake the Christmas pie, but there aren't even any clocks in the kitchen, let alone mobile phones. All you've got is two egg-timers: one that times exactly four minutes, and one that times exactly seven minutes. The scary chef tells you to put the pie in the oven for exactly ten minutes and no longer. How can you time ten minutes exactly, and avoid getting told off by the chef?",
+                answer: "Start both timers at the same time. Wait until the 4 minute timer finishes, leaving 3 minutes on the 7 minute timer. Once the 7 minute timer finishes, start it again - this gives you 3 + 7 = 10 minutes total",
+                hint: "The trick involves using the difference between the two timers"
+            }
+        ];
+
+        let currentRiddle = 0;
+        let score = 0;
+        let showingHint = false;
+        let showingAnswer = false;
+        let answered = false;
+
+        function loadRiddle() {
+            const riddle = riddles[currentRiddle];
+            document.getElementById('question').textContent = riddle.question;
+            document.getElementById('hint-text').textContent = riddle.hint;
+            document.getElementById('answer-text').textContent = riddle.answer;
+            document.getElementById('current-puzzle').textContent = currentRiddle + 1;
+            document.getElementById('current-score').textContent = score;
+            
+            document.getElementById('hint-section').classList.add('hidden');
+            document.getElementById('answer-section').classList.add('hidden');
+            document.getElementById('hint-btn').classList.remove('hidden');
+            document.getElementById('reveal-btn').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('response-buttons').classList.remove('hidden');
+            document.getElementById('recorded-message').classList.add('hidden');
+            
+            showingHint = false;
+            showingAnswer = false;
+            answered = false;
+        }
+
+        function showHint() {
+            document.getElementById('hint-section').classList.remove('hidden');
+            document.getElementById('hint-btn').classList.add('hidden');
+            showingHint = true;
+        }
+
+        function revealAnswer() {
+            document.getElementById('answer-section').classList.remove('hidden');
+            document.getElementById('reveal-btn').classList.add('hidden');
+            if (!showingHint) {
+                document.getElementById('hint-btn').classList.add('hidden');
+            }
+            showingAnswer = true;
+        }
+
+        function markCorrect() {
+            score++;
+            document.getElementById('current-score').textContent = score;
+            answered = true;
+            document.getElementById('response-buttons').classList.add('hidden');
+            document.getElementById('recorded-message').classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            
+            if (currentRiddle === riddles.length - 1) {
+                document.getElementById('next-btn').textContent = 'See Final Score →';
+            }
+        }
+
+        function markIncorrect() {
+            answered = true;
+            document.getElementById('response-buttons').classList.add('hidden');
+            document.getElementById('recorded-message').classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            
+            if (currentRiddle === riddles.length - 1) {
+                document.getElementById('next-btn').textContent = 'See Final Score →';
+            }
+        }
+
+        function nextPuzzle() {
+            if (currentRiddle < riddles.length - 1) {
+                currentRiddle++;
+                loadRiddle();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('final-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = score;
+            
+            let message = '';
+            if (score === riddles.length) {
+                message = "Perfect score! You're a puzzle master! 🌟";
+            } else if (score >= riddles.length / 2) {
+                message = "Great job! Well done! 👏";
+            } else {
+                message = "Good effort! Try again to improve your score! 💪";
+            }
+            document.getElementById('score-message').textContent = message;
+        }
+
+        function resetGame() {
+            currentRiddle = 0;
+            score = 0;
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('final-screen').classList.add('hidden');
+            loadRiddle();
+        }
+
+        // Load first riddle on page load
+        loadRiddle();
     </script>
 </body>
 </html>
